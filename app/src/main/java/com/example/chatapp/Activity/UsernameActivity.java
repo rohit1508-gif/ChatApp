@@ -21,6 +21,7 @@ import com.example.chatapp.ModalClass.User;
 import com.example.chatapp.Adapter.UserAdapter;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -59,14 +60,8 @@ public class UsernameActivity extends AppCompatActivity {
         fuser = FirebaseAuth.getInstance().getCurrentUser();
         if(fuser!=null)
         uid = fuser.getUid();
-        FloatingActionButton buttonAddNote = findViewById(R.id.button_add_note);
-        buttonAddNote.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent i = new Intent(UsernameActivity.this, NewUserActivity.class);
-                startActivity(i);
-            }
-        });
+        BottomNavigationView btview = findViewById(R.id.bottom_navigation);
+        btview.setOnNavigationItemSelectedListener(navListener);
         sp = getSharedPreferences("login",MODE_PRIVATE);
         databasenote = FirebaseDatabase.getInstance().getReference("Users");
         recyclerView = findViewById(R.id.recycler_view);
@@ -113,6 +108,31 @@ public class UsernameActivity extends AppCompatActivity {
             }
         });
     }
+    BottomNavigationView.OnNavigationItemSelectedListener navListener=
+            new BottomNavigationView.OnNavigationItemSelectedListener() {
+                @Override
+                public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                    switch (item.getItemId()){
+                        case R.id.nav_search:
+                            Intent i = new Intent(UsernameActivity.this,SearchActivity.class);
+                            startActivity(i);
+                            break;
+                        case R.id.nav_notification:
+                            Intent c = new Intent(UsernameActivity.this,NotificationActivity.class);
+                            startActivity(c);
+                            break;
+                        case R.id.nav_profile:
+                        Intent b = new Intent(UsernameActivity.this,ProfileActivity.class);
+                        startActivity(b);
+                        break;
+                        case R.id.nav_newUser:
+                            Intent a = new Intent(UsernameActivity.this,NewUserActivity.class);
+                            startActivity(a);
+                            break;
+                    }
+                        return true;
+                }
+            };
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
@@ -126,10 +146,6 @@ public class UsernameActivity extends AppCompatActivity {
                sp.edit().putBoolean("logged",false).apply();
                 Intent intent  = new Intent(getApplicationContext(), LoginActivity.class);
                 startActivity(intent);
-                return true;
-            case R.id.Profile:
-                Intent i  = new Intent(getApplicationContext(), ProfileActivity.class);
-                startActivity(i);
                 return true;
             case R.id.resetPassword:
                 email = FirebaseAuth.getInstance().getCurrentUser().getEmail();
