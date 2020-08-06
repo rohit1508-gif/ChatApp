@@ -57,7 +57,7 @@ public class MainActivity extends AppCompatActivity {
     TextView textView2;
     CircleImageView imageView;
     int Pick_image =1,a;
-    Uri imageUri;
+    Uri imageUri,resultUri;
     String uid,imageUrl;
     DatabaseReference databasenote;
     private StorageReference mStorageRef;
@@ -109,7 +109,18 @@ public class MainActivity extends AppCompatActivity {
         if (requestCode == Pick_image && resultCode == RESULT_OK) {
             assert data != null;
             imageUri = data.getData();
-            imageView.setImageURI(imageUri);
+            CropImage.activity(imageUri)
+                    .setGuidelines(CropImageView.Guidelines.ON)
+                    .setAspectRatio(1,1)
+                    .start(this);
+        }
+        if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
+            CropImage.ActivityResult result = CropImage.getActivityResult(data);
+          if(resultCode == RESULT_OK){
+              assert result != null;
+              resultUri = result.getUri();
+             imageView.setImageURI(resultUri);
+          }
         }
     }
     private String getFileExtension(Uri uri) {
@@ -184,8 +195,8 @@ public class MainActivity extends AppCompatActivity {
                                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
                                 if(user != null)
                                 uid = user.getUid();
-                                StorageReference fileReference = mStorageRef.child(uid).child(getFileExtension(imageUri));
-                                mUploadTask = fileReference.putFile(imageUri)
+                                StorageReference fileReference = mStorageRef.child(uid).child(getFileExtension(resultUri));
+                                mUploadTask = fileReference.putFile(resultUri)
                                         .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                                             @Override
                                             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
