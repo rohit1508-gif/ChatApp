@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:layout_marginTop="1dp">
+<RelativeLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="8dp">
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:id="@+id/requestImage"/>
+
+    <TextView
+        android:id="@+id/requestName"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/requestImage"
+        android:textColor="#FFFFFF"
+        android:textSize="16sp"
+        android:textStyle="bold" />
+
+    <ImageButton
+        android:id="@+id/acceptButton"
+        android:layout_width="40dp"
+        android:layout_height="38dp"
+        android:layout_marginLeft="10dp"
+        android:layout_toRightOf="@id/requestName"
+        android:background="#04F80E"
+        android:src="@drawable/ic_accept" />
+
+    <ImageButton
+        android:layout_width="37dp"
+        android:layout_height="39dp"
+        android:layout_marginLeft="20dp"
+        android:layout_toRightOf="@id/acceptButton"
+        android:background="#F61403"
+        android:src="@drawable/ic_cancel"
+        android:id="@+id/rejectButton"/>
+</RelativeLayout>
+</androidx.cardview.widget.CardView>

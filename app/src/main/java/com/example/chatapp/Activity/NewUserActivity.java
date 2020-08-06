@@ -9,6 +9,7 @@ import android.content.Context;
 import android.os.Bundle;
 
 import com.example.chatapp.Adapter.NewUserAdapter;
+import com.example.chatapp.Adapter.NotificationAdapter;
 import com.example.chatapp.Adapter.UserAdapter;
 import com.example.chatapp.ModalClass.User;
 import com.example.chatapp.R;
@@ -34,31 +35,42 @@ public class NewUserActivity extends AppCompatActivity {
     private Context ctx;
     String uid;
     FirebaseUser fuser;
-    List<User> auser;
+    List<User> muser;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_user);
         fuser = FirebaseAuth.getInstance().getCurrentUser();
-        if(fuser!=null)
-            uid = fuser.getUid();
-        recyclerView = findViewById(R.id.recycler_view);
+        recyclerView = findViewById(R.id.recycler_view1);
         recyclerView.setHasFixedSize(true);
-        auser= new ArrayList<>();
+        muser= new ArrayList<>();
         ctx = NewUserActivity.this;
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        FirebaseDatabase.getInstance().getReference("Users").addValueEventListener(new ValueEventListener() {
+        FirebaseDatabase.getInstance().getReference("Users").child(fuser.getUid()).child("Friends").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                auser.clear();
-                for(DataSnapshot dataSnapshot:snapshot.getChildren()){
-                    User u = dataSnapshot.getValue(User.class);
-                    if(u!=null)
-                        if(!(u.getUid().equals(uid)))
-                            auser.add(u);
-                }
-                adapter = new NewUserAdapter(auser,ctx);
-                recyclerView.setAdapter(adapter);
+                  if(snapshot.exists())
+                      for(DataSnapshot dataSnapshot:snapshot.getChildren()){
+                          uid = dataSnapshot.getValue().toString();
+                          FirebaseDatabase.getInstance().getReference("Users").addListenerForSingleValueEvent(new ValueEventListener() {
+                              @Override
+                              public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                  for(DataSnapshot dataSnapshot1:snapshot.getChildren()){
+                                      User u = dataSnapshot1.getValue(User.class);
+                                      if(u!=null)
+                                          if(u.getUid().equals(uid))
+                                              muser.add(u);
+                                  }
+                                  adapter = new NewUserAdapter(muser,ctx);
+                                  recyclerView.setAdapter(adapter);
+                              }
+
+                              @Override
+                              public void onCancelled(@NonNull DatabaseError error) {
+
+                              }
+                          });
+                      }
             }
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
@@ -67,7 +79,7 @@ public class NewUserActivity extends AppCompatActivity {
         });
     }
     private void status(String status){
-        FirebaseDatabase.getInstance().getReference("Users").child(uid).child("status").setValue(status);
+        FirebaseDatabase.getInstance().getReference("Users").child(fuser.getUid()).child("status").setValue(status);
     }
 
     @Override
