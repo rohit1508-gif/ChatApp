@@ -32,8 +32,11 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.SignInMethodQueryResult;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.StorageTask;
@@ -120,17 +123,37 @@ public class MainActivity extends AppCompatActivity {
         name =  editText3.getText().toString();
         email = editText.getText().toString();
         password = editText2.getText().toString();
-        auth.fetchSignInMethodsForEmail(email)
-                .addOnCompleteListener(new OnCompleteListener<SignInMethodQueryResult>() {
+        FirebaseDatabase.getInstance().getReference("Users")
+                .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
-                    public void onComplete(@NonNull Task<SignInMethodQueryResult> task) {
-                        boolean isNew = task.getResult().getSignInMethods().isEmpty();
-                        if(isNew){
-                            startFunction();
-                        }
-                        else{
-                            Toast.makeText(MainActivity.this,"Email is already registred,Please try another!",Toast.LENGTH_SHORT).show();
-                        }
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        if(snapshot.exists())
+                            for(DataSnapshot dataSnapshot:snapshot.getChildren()){
+                                String uname = dataSnapshot.child("name").getValue().toString();
+                                if(uname.equals(name)){
+                                    Toast.makeText(MainActivity.this,"Username is already in use,Please try another!",Toast.LENGTH_SHORT).show();
+                                }
+                                else{
+                                    auth.fetchSignInMethodsForEmail(email)
+                                            .addOnCompleteListener(new OnCompleteListener<SignInMethodQueryResult>() {
+                                                @Override
+                                                public void onComplete(@NonNull Task<SignInMethodQueryResult> task) {
+                                                    boolean isNew = task.getResult().getSignInMethods().isEmpty();
+                                                    if(isNew){
+                                                        startFunction();
+                                                    }
+                                                    else{
+                                                        Toast.makeText(MainActivity.this,"Email is already registred,Please try another!",Toast.LENGTH_SHORT).show();
+                                                    }
+                                                }
+                                            });
+                                }
+                            }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
                     }
                 });
     }

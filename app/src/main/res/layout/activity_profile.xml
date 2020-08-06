@@ -23,46 +23,52 @@
         android:id="@+id/imageView2"
         android:layout_width="209dp"
         android:layout_height="200dp"
-        android:layout_marginEnd="124dp"
         android:layout_marginBottom="60dp"
         android:src="@drawable/profile"
         app:civ_border_color="@color/common_google_signin_btn_text_dark_focused"
         app:civ_border_width="4dp"
         app:layout_constraintBottom_toTopOf="@+id/textView"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <ImageButton
         android:id="@+id/imageButton"
         android:layout_width="59dp"
         android:layout_height="55dp"
         android:layout_marginStart="12dp"
+        android:layout_marginEnd="29dp"
         android:layout_marginBottom="264dp"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/textView"
         app:srcCompat="@android:drawable/ic_menu_edit" />
 
     <EditText
         android:id="@+id/editText4"
-        android:layout_width="248dp"
-        android:layout_height="55dp"
-        android:layout_marginStart="59dp"
-        android:layout_marginBottom="264dp"
+        android:layout_width="236dp"
+        android:layout_height="51dp"
+        android:layout_marginStart="36dp"
+        android:layout_marginTop="21dp"
+        android:layout_marginBottom="192dp"
         android:alpha="0"
         android:ems="10"
         android:inputType="textPersonName"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView" />
 
     <Button
         android:id="@+id/button2"
-        android:layout_width="60dp"
-        android:layout_height="50dp"
-        android:layout_marginStart="12dp"
-        android:layout_marginBottom="264dp"
+        android:layout_width="84dp"
+        android:layout_height="45dp"
+        android:layout_marginStart="11dp"
+        android:layout_marginEnd="44dp"
+        android:layout_marginBottom="200dp"
         android:alpha="0"
         android:text="SAVE"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/textView" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/editText4" />
 
     <Button
         android:id="@+id/button3"

@@ -81,7 +81,7 @@
             android:layout_height="40dp"
             android:layout_alignParentEnd="true"
             app:srcCompat="@android:drawable/ic_menu_send"
-            android:background="#FDFCFC" />
+            android:background="#818080" />
     </RelativeLayout>
 
     <androidx.recyclerview.widget.RecyclerView

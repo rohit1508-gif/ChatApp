@@ -23,12 +23,6 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.example.chatapp.ModalClass.Chat;
 import com.example.chatapp.Adapter.ChatAdapter;
-import com.example.chatapp.Notification.APIService;
-import com.example.chatapp.Notification.Client;
-import com.example.chatapp.Notification.Data;
-import com.example.chatapp.Notification.MyResponse;
-import com.example.chatapp.Notification.Sender;
-import com.example.chatapp.Notification.Token;
 import com.example.chatapp.R;
 import com.example.chatapp.ModalClass.User;
 import com.google.android.gms.tasks.Task;
@@ -70,8 +64,6 @@ public class ChatActivity extends AppCompatActivity {
     List<Chat> mchat;
     RecyclerView recyclerView;
     Context ctx;
-    APIService apiService;
-    boolean notify = false;
     ValueEventListener seenListener;
     DatabaseReference reference;
     @Override
@@ -105,7 +97,6 @@ public class ChatActivity extends AppCompatActivity {
                 startActivity(i);
             }
         });
-        apiService = Client.getClient("https://fcm.googleapis.com/").create(APIService.class);
         Glide.with(ChatActivity.this).load(ImageUrl).into(userImage);
         FirebaseDatabase.getInstance().getReference("Users").child(uid)
                 .addValueEventListener(new ValueEventListener() {
@@ -126,7 +117,6 @@ public class ChatActivity extends AppCompatActivity {
         sendImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                notify = true;
                 String msg = sendTxt.getText().toString();
                 if(!msg.equals("")){
                     sendMessage(fuser.getUid(),uid,msg);
@@ -180,24 +170,6 @@ public class ChatActivity extends AppCompatActivity {
         key = FirebaseDatabase.getInstance().getReference("Chats").push().getKey();
        hashMap.put("key",key);
         FirebaseDatabase.getInstance().getReference("Chats").child(key).setValue(hashMap);
-
-        final String msg1 = msg;
-        FirebaseDatabase.getInstance().getReference("User").child(fuser.getUid()).addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                User user = dataSnapshot.getValue(User.class);
-                if (notify) {
-                     if(user != null)
-                    sendNotifiaction(receiver, user.getName(), msg1);
-                }
-                notify = false;
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
     }
     public void readmessage(final String myid, final String userid, final String imageUrl){
         mchat= new ArrayList<>();
@@ -225,46 +197,6 @@ public class ChatActivity extends AppCompatActivity {
 
                     }
                 });
-    }
-    private void sendNotifiaction(String receiver, final String username, final String message){
-        DatabaseReference tokens = FirebaseDatabase.getInstance().getReference("Tokens");
-        Query query = tokens.orderByKey().equalTo(receiver);
-        query.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                for (DataSnapshot snapshot : dataSnapshot.getChildren()){
-                    Token token = snapshot.getValue(Token.class);
-                    Data data = new Data(fuser.getUid(), R.mipmap.ic_launcher, username+": "+message, "New Message",
-                            key);
-
-                    assert token != null;
-                    Sender sender = new Sender(data, token.getToken());
-
-                    apiService.sendNotification(sender)
-                            .enqueue(new Callback<MyResponse>() {
-                                @Override
-                                public void onResponse(Call<MyResponse> call, Response<MyResponse> response) {
-                                    if (response.code() == 200){
-                                        if(response.body() != null)
-                                        if (response.body().success != 1){
-                                            Toast.makeText(ChatActivity.this, "Failed!", Toast.LENGTH_SHORT).show();
-                                        }
-                                    }
-                                }
-
-                                @Override
-                                public void onFailure(Call<MyResponse> call, Throwable t) {
-
-                                }
-                            });
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
     }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -314,7 +246,6 @@ public class ChatActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        reference.removeEventListener(seenListener);
         Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("GMT+5:30"));
         Date currentLocalTime = cal.getTime();
         DateFormat date = new SimpleDateFormat("dd MMM,yyyy hh:mm a");
