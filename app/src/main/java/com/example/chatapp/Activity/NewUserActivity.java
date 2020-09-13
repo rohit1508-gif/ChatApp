@@ -27,6 +27,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 import java.util.TimeZone;
 
 public class NewUserActivity extends AppCompatActivity {
@@ -46,12 +47,13 @@ public class NewUserActivity extends AppCompatActivity {
         muser= new ArrayList<>();
         ctx = NewUserActivity.this;
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        FirebaseDatabase.getInstance().getReference("Users").child(fuser.getUid()).child("Friends").addListenerForSingleValueEvent(new ValueEventListener() {
+        FirebaseDatabase.getInstance().getReference("Users").child(fuser.getUid()).child("Friends").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                  if(snapshot.exists())
+                muser.clear();
+                if(snapshot.exists())
                       for(DataSnapshot dataSnapshot:snapshot.getChildren()){
-                          uid = dataSnapshot.getValue().toString();
+                          uid = Objects.requireNonNull(dataSnapshot.getValue()).toString();
                           FirebaseDatabase.getInstance().getReference("Users").addListenerForSingleValueEvent(new ValueEventListener() {
                               @Override
                               public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -64,7 +66,6 @@ public class NewUserActivity extends AppCompatActivity {
                                   adapter = new NewUserAdapter(muser,ctx);
                                   recyclerView.setAdapter(adapter);
                               }
-
                               @Override
                               public void onCancelled(@NonNull DatabaseError error) {
 

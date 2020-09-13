@@ -118,6 +118,7 @@ public class ChatActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 String msg = sendTxt.getText().toString();
+                msg = msg.trim();
                 if(!msg.equals("")){
                     sendMessage(fuser.getUid(),uid,msg);
                 }

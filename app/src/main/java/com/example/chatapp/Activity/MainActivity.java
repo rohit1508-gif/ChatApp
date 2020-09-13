@@ -87,7 +87,7 @@ public class MainActivity extends AppCompatActivity {
                     editText2.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
                     a=0;
                 }
-               else if(a==0){
+                else if(a==0){
                     editText2.setTransformationMethod(PasswordTransformationMethod.getInstance());
                     a=1;
                 }
@@ -115,13 +115,13 @@ public class MainActivity extends AppCompatActivity {
                     .start(this);
         }
         if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
-            CropImage.ActivityResult result = CropImage.getActivityResult(data);
-          if(resultCode == RESULT_OK){
-              assert result != null;
-              resultUri = result.getUri();
-             imageView.setImageURI(resultUri);
-          }
+          CropImage.ActivityResult result = CropImage.getActivityResult(data);
+        if(resultCode == RESULT_OK){
+          assert result != null;
+        resultUri = result.getUri();
+        imageView.setImageURI(resultUri);
         }
+    }
     }
     private String getFileExtension(Uri uri) {
         ContentResolver cR = getContentResolver();
@@ -151,10 +151,10 @@ public class MainActivity extends AppCompatActivity {
                                                 public void onComplete(@NonNull Task<SignInMethodQueryResult> task) {
                                                     boolean isNew = task.getResult().getSignInMethods().isEmpty();
                                                     if(isNew){
-                                                        startFunction();
+                                                        startFunction(name,email,password);
                                                     }
                                                     else{
-                                                        Toast.makeText(MainActivity.this,"Email is already registred,Please try another!",Toast.LENGTH_SHORT).show();
+                                                        Toast.makeText(MainActivity.this,"Email is already registered,Please try another!",Toast.LENGTH_SHORT).show();
                                                     }
                                                 }
                                             });
@@ -168,7 +168,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
     }
-    public void startFunction()
+    public void startFunction(String name,String email,String password)
     {
         if(email.isEmpty())
         {
@@ -185,6 +185,11 @@ public class MainActivity extends AppCompatActivity {
             editText3.setError("Please enter Name");
             editText3.requestFocus();
         }
+        else if(resultUri==null)
+        {
+            Toast.makeText(MainActivity.this,"Please select a profile picture",Toast.LENGTH_SHORT).show();
+            imageView.requestFocus();
+        }
         else {
             auth.createUserWithEmailAndPassword(email, password)
                     .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
@@ -192,40 +197,40 @@ public class MainActivity extends AppCompatActivity {
                         public void onComplete(@NonNull Task<AuthResult> task) {
                             if (task.isSuccessful()) {
                                 Log.d("EmailPassword", "signUpWithEmail:success");
-                               FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-                                if(user != null)
-                                uid = user.getUid();
-                                StorageReference fileReference = mStorageRef.child(uid).child(getFileExtension(resultUri));
-                                mUploadTask = fileReference.putFile(resultUri)
-                                        .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                                            @Override
-                                            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                                                if (taskSnapshot.getMetadata() != null) {
-                                                    if (taskSnapshot.getMetadata().getReference() != null) {
-                                                        Task<Uri> result = taskSnapshot.getStorage().getDownloadUrl();
-                                                        result.addOnSuccessListener(new OnSuccessListener<Uri>() {
-                                                            @Override
-                                                            public void onSuccess(Uri uri) {
-                                                                imageUrl = uri.toString();
-                                                                HashMap<String,Object> hashMap = new HashMap<>();
-                                                                hashMap.put("uid",uid);
-                                                                hashMap.put("name",name);
-                                                                hashMap.put("imageUrl",imageUrl);
-                                                                databasenote.child(uid).setValue(hashMap);
-                                                                sendEmailVerification();
-                                                                Intent intent = new Intent(getApplicationContext(), UsernameActivity.class);
-                                                                startActivity(intent);
-                                                            }
-                                                        });
+                                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                                if (user != null) {
+                                    uid = user.getUid();
+                                    StorageReference fileReference = mStorageRef.child(uid).child(getFileExtension(imageUri));
+                                    mUploadTask = fileReference.putFile(resultUri)
+                                            .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                                                @Override
+                                                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                                                    if (taskSnapshot.getMetadata() != null) {
+                                                        if (taskSnapshot.getMetadata().getReference() != null) {
+                                                            Task<Uri> result = taskSnapshot.getStorage().getDownloadUrl();
+                                                            result.addOnSuccessListener(new OnSuccessListener<Uri>() {
+                                                                @Override
+                                                                public void onSuccess(Uri uri) {
+                                                                    imageUrl = uri.toString();
+                                                                    HashMap<String, Object> hashMap = new HashMap<>();
+                                                                    hashMap.put("uid", uid);
+                                                                    hashMap.put("name", name);
+                                                                    hashMap.put("imageUrl", imageUrl);
+                                                                    databasenote.child(uid).setValue(hashMap);
+                                                                    sendEmailVerification();
+                                                                    Toast.makeText(MainActivity.this, "Registered Successfully", Toast.LENGTH_SHORT).show();
+                                                                    Intent intent = new Intent(getApplicationContext(), UsernameActivity.class);
+                                                                    startActivity(intent);
+                                                                }
+                                                            });
+                                                        }
                                                     }
                                                 }
-                                            }
-                                        });
-
-                            } else {
+                                            });
+                                }}
+                           else {
                                 Log.w("EmailPassword", "signUpWithEmail:failure", task.getException());
-                                Toast.makeText(MainActivity.this, "Authentication failed.",
-                                        Toast.LENGTH_SHORT).show();
+                                Toast.makeText(MainActivity.this, "Authentication failed",Toast.LENGTH_SHORT).show();
                             }
                         }
                     });
@@ -257,5 +262,4 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
         startActivity(intent);
     }
-
 }

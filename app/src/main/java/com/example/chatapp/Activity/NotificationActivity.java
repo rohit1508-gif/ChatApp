@@ -38,10 +38,10 @@ public class NotificationActivity extends AppCompatActivity {
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         FirebaseDatabase.getInstance().getReference("Users").child(fuser.getUid()).child("Request")
-                .addListenerForSingleValueEvent(new ValueEventListener() {
+                .addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        if(snapshot.exists())
+                        if(snapshot.exists()){
                       for(DataSnapshot dataSnapshot:snapshot.getChildren()){
                           uid = dataSnapshot.getValue().toString();
                           FirebaseDatabase.getInstance().getReference("Users").addValueEventListener(new ValueEventListener() {
@@ -53,8 +53,6 @@ public class NotificationActivity extends AppCompatActivity {
                                           if(u.getUid().equals(uid))
                                               muser.add(u);
                                   }
-                                  adapter = new NotificationAdapter(muser,ctx);
-                                  recyclerView.setAdapter(adapter);
                               }
 
                               @Override
@@ -63,6 +61,8 @@ public class NotificationActivity extends AppCompatActivity {
                               }
                           });
                       }
+                        adapter = new NotificationAdapter(muser,ctx);
+                        recyclerView.setAdapter(adapter);}
                     }
 
                     @Override
