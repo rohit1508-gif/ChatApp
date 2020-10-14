@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.example.chatapp.Adapter.NewUserAdapter;
 import com.example.chatapp.Adapter.NotificationAdapter;
@@ -54,15 +55,12 @@ public class NewUserActivity extends AppCompatActivity {
                 if(snapshot.exists())
                       for(DataSnapshot dataSnapshot:snapshot.getChildren()){
                           uid = Objects.requireNonNull(dataSnapshot.getValue()).toString();
-                          FirebaseDatabase.getInstance().getReference("Users").addListenerForSingleValueEvent(new ValueEventListener() {
+                          FirebaseDatabase.getInstance().getReference("Users").child(uid).addListenerForSingleValueEvent(new ValueEventListener() {
                               @Override
                               public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                  for(DataSnapshot dataSnapshot1:snapshot.getChildren()){
-                                      User u = dataSnapshot1.getValue(User.class);
+                                      User u = snapshot.getValue(User.class);
                                       if(u!=null)
-                                          if(u.getUid().equals(uid))
-                                              muser.add(u);
-                                  }
+                                          muser.add(u);
                                   adapter = new NewUserAdapter(muser,ctx);
                                   recyclerView.setAdapter(adapter);
                               }
