@@ -44,15 +44,14 @@ public class NotificationActivity extends AppCompatActivity {
                         if(snapshot.exists()){
                       for(DataSnapshot dataSnapshot:snapshot.getChildren()){
                           uid = dataSnapshot.getValue().toString();
-                          FirebaseDatabase.getInstance().getReference("Users").addValueEventListener(new ValueEventListener() {
+                          FirebaseDatabase.getInstance().getReference("Users").child(uid).addValueEventListener(new ValueEventListener() {
                               @Override
-                              public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                  for(DataSnapshot dataSnapshot1:snapshot.getChildren()){
-                                      User u = dataSnapshot1.getValue(User.class);
+                              public void onDataChange(@NonNull DataSnapshot snapshot1) {
+                                      User u = snapshot1.getValue(User.class);
                                       if(u!=null)
-                                          if(u.getUid().equals(uid))
-                                              muser.add(u);
-                                  }
+                                          muser.add(u);
+                                  adapter = new NotificationAdapter(muser,ctx);
+                                  recyclerView.setAdapter(adapter);
                               }
 
                               @Override
@@ -61,8 +60,7 @@ public class NotificationActivity extends AppCompatActivity {
                               }
                           });
                       }
-                        adapter = new NotificationAdapter(muser,ctx);
-                        recyclerView.setAdapter(adapter);}
+                        }
                     }
 
                     @Override
