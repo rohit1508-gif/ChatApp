@@ -16,6 +16,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.example.chatapp.ModalClass.Chat;
+import com.example.chatapp.Notification.Token;
 import com.example.chatapp.R;
 import com.example.chatapp.ModalClass.User;
 import com.example.chatapp.Adapter.UserAdapter;
@@ -30,6 +31,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.iid.FirebaseInstanceId;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -107,6 +109,7 @@ public class UsernameActivity extends AppCompatActivity {
 
             }
         });
+        updateToken(FirebaseInstanceId.getInstance().getToken());
     }
     BottomNavigationView.OnNavigationItemSelectedListener navListener=
             new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -200,5 +203,10 @@ private void status(String status){
         date.setTimeZone(TimeZone.getTimeZone("GMT+5:30"));
         String time = date.format(currentLocalTime);
         status(time);
+    }
+    private void updateToken(String token){
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Tokens");
+        Token token1 = new Token(token);
+        reference.child(fuser.getUid()).setValue(token1);
     }
 }

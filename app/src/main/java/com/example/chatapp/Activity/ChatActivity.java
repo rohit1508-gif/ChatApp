@@ -23,6 +23,12 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.example.chatapp.ModalClass.Chat;
 import com.example.chatapp.Adapter.ChatAdapter;
+import com.example.chatapp.Notification.APIService;
+import com.example.chatapp.Notification.Client;
+import com.example.chatapp.Notification.Data;
+import com.example.chatapp.Notification.MyResponse;
+import com.example.chatapp.Notification.Sender;
+import com.example.chatapp.Notification.Token;
 import com.example.chatapp.R;
 import com.example.chatapp.ModalClass.User;
 import com.google.android.gms.tasks.Task;
@@ -66,6 +72,8 @@ public class ChatActivity extends AppCompatActivity {
     Context ctx;
     ValueEventListener seenListener;
     DatabaseReference reference;
+    APIService apiService;
+    boolean notify = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -76,6 +84,7 @@ public class ChatActivity extends AppCompatActivity {
         Name = i.getStringExtra("Name");
         ImageUrl = i.getStringExtra("ImageUrl");
         status = i.getStringExtra("status");
+        apiService = Client.getClient("https://fcm.googleapis.com").create(APIService.class);
         userImage = findViewById(R.id.userImage);
         userName = findViewById(R.id.userName);
         status1 = findViewById(R.id.status1);
@@ -113,10 +122,11 @@ public class ChatActivity extends AppCompatActivity {
 
                     }
                 });
-        seenMesage(uid);
+        seenMessage(uid);
         sendImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                notify = true;
                 String msg = sendTxt.getText().toString();
                 msg = msg.trim();
                 if(!msg.equals("")){
@@ -134,7 +144,7 @@ public class ChatActivity extends AppCompatActivity {
        Intent i = new Intent(ChatActivity.this,UsernameActivity.class);
        startActivity(i);
     }
-    public void seenMesage(String useruid){
+    public void seenMessage(String useruid){
         reference = FirebaseDatabase.getInstance().getReference("Chats");
         seenListener = reference.addValueEventListener(new ValueEventListener() {
             @Override
@@ -171,6 +181,58 @@ public class ChatActivity extends AppCompatActivity {
         key = FirebaseDatabase.getInstance().getReference("Chats").push().getKey();
        hashMap.put("key",key);
         FirebaseDatabase.getInstance().getReference("Chats").child(key).setValue(hashMap);
+        String message = msg;
+        reference = FirebaseDatabase.getInstance().getReference("Users").child(fuser.getUid());
+        reference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                User user = snapshot.getValue(User.class);
+                if(notify) {
+                    sendNotification(receiver, user.getName(), message);
+                }
+                notify = false;
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+    public void sendNotification(String receiver,String username,String message){
+        DatabaseReference tokens = FirebaseDatabase.getInstance().getReference("Tokens");
+        Query query = tokens.orderByKey().equalTo(receiver);
+        query.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for(DataSnapshot dataSnapshot:snapshot.getChildren()){
+                    Token token = dataSnapshot.getValue(Token.class);
+                    Data data = new Data(fuser.getUid(),R.mipmap.ic_launcher,username+": "+message,"New Message",uid);
+                    Sender sender = new Sender(data,token.getToken());
+                    apiService.sendNotification(sender)
+                            .enqueue(new Callback<MyResponse>() {
+                                @Override
+                                public void onResponse(Call<MyResponse> call, Response<MyResponse> response) {
+                                    if(response.code() == 200){
+                                        if(response.body().success!=1){
+                                            Toast.makeText(ChatActivity.this,"Failed!",Toast.LENGTH_SHORT).show();
+                                        }
+                                    }
+                                }
+
+                                @Override
+                                public void onFailure(Call<MyResponse> call, Throwable t) {
+
+                                }
+                            });
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
     public void readmessage(final String myid, final String userid, final String imageUrl){
         mchat= new ArrayList<>();
