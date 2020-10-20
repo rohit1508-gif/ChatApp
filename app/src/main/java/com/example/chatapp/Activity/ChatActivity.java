@@ -66,12 +66,13 @@ public class ChatActivity extends AppCompatActivity {
     Context ctx;
     ValueEventListener seenListener;
     DatabaseReference reference;
+    Intent i;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat2);
         ChatActivity.this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
-        Intent i = getIntent();
+        i = getIntent();
         uid = i.getStringExtra("UID");
         Name = i.getStringExtra("Name");
         ImageUrl = i.getStringExtra("ImageUrl");
