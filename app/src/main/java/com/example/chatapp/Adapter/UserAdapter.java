@@ -57,8 +57,13 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ImageViewHolde
                             Chat chat = dataSnapshot.getValue(Chat.class);
                             if(chat!=null)
                             if(chat.getReceiver().equals(fuser.getUid()) && chat.getSender().equals(u.getUid()) ||
-                                    chat.getReceiver().equals(u.getUid()) && chat.getSender().equals(fuser.getUid())){
-                        Lastmessage = chat.getMsg();}
+                                    chat.getReceiver().equals(u.getUid()) && chat.getSender().equals(fuser.getUid())) {
+                                if (chat.getType().equals("text")) {
+                                    Lastmessage = chat.getMsg();
+                                } else {
+                                    Lastmessage = "Photo";
+                                }
+                            }
                     }
                 if(Lastmessage.equals(".%f9e%>?<:1!e|??"))
                     holder.lastMessage.setText("");
@@ -79,7 +84,6 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ImageViewHolde
                 i.putExtra("UID",u.getUid());
                 i.putExtra("Name",u.getName());
                 i.putExtra("ImageUrl",u.getImageUrl());
-                i.putExtra("status",u.getStatus());
                 context.startActivity(i);
             }
         });

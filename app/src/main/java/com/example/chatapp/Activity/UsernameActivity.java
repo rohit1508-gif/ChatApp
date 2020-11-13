@@ -81,8 +81,7 @@ public class UsernameActivity extends AppCompatActivity {
                         if(l!=null && fuser!=null && !(l.getUid().equals(uid)))
                         {
                             FirebaseDatabase.getInstance().getReference("Chats").addListenerForSingleValueEvent(new ValueEventListener() {
-                                @Override
-                                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                @Override public void onDataChange(@NonNull DataSnapshot snapshot) {
                                     r=0;
                                     for(DataSnapshot dataSnapshot:snapshot.getChildren())
                                     {

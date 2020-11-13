@@ -28,6 +28,8 @@ import java.util.List;
 import static androidx.constraintlayout.widget.Constraints.TAG;
 
 public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
+    private static final int IMAGE_TYPE_RIGHT = 2;
+    private static final int IMAGE_TYPE_LEFT = 3;
     private Context context;
     private List<Chat> mchat;
     private String imageUrl;
@@ -48,8 +50,16 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
         if (viewType == MSG_TYPE_RIGHT) {
             View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.chat_item_right, parent, false);
             return new ViewHolder(view);
-        } else {
+        } else if(viewType == MSG_TYPE_LEFT) {
             View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.chat_item_left, parent, false);
+            return new ViewHolder(view);
+        }
+        else if(viewType == IMAGE_TYPE_RIGHT){
+            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.image_item_right, parent, false);
+            return new ViewHolder(view);
+        }
+        else{
+            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.image_item_left, parent, false);
             return new ViewHolder(view);
         }
     }
@@ -57,8 +67,12 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
     @Override
     public void onBindViewHolder(@NonNull final ChatAdapter.ViewHolder holder, final int position) {
         final Chat u =mchat.get(position);
+        if(u.getType().equals("text")){
         holder.show_message.setText(u.getMsg());
-        Glide.with(context).load(imageUrl).into(holder.profile_image);
+        Glide.with(context).load(imageUrl).into(holder.profile_image);}
+        else{
+            Glide.with(context).load(u.getMsg()).into(holder.image);
+        }
         holder.time.setText(u.getTime());
         if(position==mchat.size()-1){
             if(u.isIsseen()){
@@ -105,7 +119,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
 
     static class ViewHolder extends RecyclerView.ViewHolder {
         TextView show_message,time,seen;
-        ImageView profile_image;
+        ImageView profile_image,image;
         View mview;
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -113,6 +127,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
             profile_image = itemView.findViewById(R.id.profile_image);
             time = itemView.findViewById(R.id.time);
             seen = itemView.findViewById(R.id.seenMessage);
+            image = itemView.findViewById(R.id.image);
             mview =itemView;
         }
     }
@@ -120,11 +135,21 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
     @Override
     public int getItemViewType(int position) {
         fuser = FirebaseAuth.getInstance().getCurrentUser();
-        if(mchat.get(position).getSender().equals(fuser.getUid())){
-            return MSG_TYPE_RIGHT;
-        }
-        else{
-            return MSG_TYPE_LEFT;
-        }
+       if(mchat.get(position).getType().equals("text")){
+           if(mchat.get(position).getSender().equals(fuser.getUid())){
+               return  MSG_TYPE_RIGHT;
+           }
+           else{
+               return MSG_TYPE_LEFT;
+           }
+       }
+       else{
+           if(mchat.get(position).getSender().equals(fuser.getUid())){
+               return  IMAGE_TYPE_RIGHT;
+           }
+           else{
+               return IMAGE_TYPE_LEFT;
+           }
+       }
     }
 }
