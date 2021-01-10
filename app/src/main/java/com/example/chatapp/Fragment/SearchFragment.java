@@ -1,16 +1,18 @@
-package com.example.chatapp.Activity;
-
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
+package com.example.chatapp.Fragment;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.chatapp.Adapter.SearchAdapter;
 import com.example.chatapp.ModalClass.User;
@@ -24,26 +26,26 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SearchActivity extends AppCompatActivity {
-EditText searchText;
-RecyclerView recyclerView;
-String username;
-List<User> muser;
-SearchAdapter adapter;
-Context ctx;
-Button button6;
-String name;
+public class SearchFragment extends Fragment {
+    EditText searchText;
+    RecyclerView recyclerView;
+    String username;
+    List<User> muser;
+    SearchAdapter adapter;
+    Context ctx;
+    Button button6;
+    String name;
+    @Nullable
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_search);
-        searchText = findViewById(R.id.searchText);
-        recyclerView = findViewById(R.id.recycler_view2);
-        button6 = findViewById(R.id.button6);
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_search, container, false);
+        searchText = view.findViewById(R.id.searchText);
+        recyclerView = view.findViewById(R.id.recycler_view2);
+        button6 = view.findViewById(R.id.button6);
         recyclerView.setHasFixedSize(true);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         muser = new ArrayList<>();
-        ctx = SearchActivity.this;
+        ctx = getActivity();
         FirebaseDatabase.getInstance().getReference("Users").child(FirebaseAuth.getInstance().getCurrentUser().getUid())
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
@@ -61,9 +63,10 @@ String name;
             public void onClick(View v) {
                 username = searchText.getText().toString();
                 if(!(username.equals(name)))
-                search(username);
+                    search(username);
             }
         });
+        return view;
     }
     public void search(String username) {
         FirebaseDatabase.getInstance().getReference("Users").addListenerForSingleValueEvent(new ValueEventListener() {
@@ -72,13 +75,14 @@ String name;
                 muser.clear();
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                     User u = dataSnapshot.getValue(User.class);
-                    if(u != null)
-                    if (username.equals(u.getName())) {
-                        muser.add(u);
-                    }
+                    if(u != null){
+                        String nam = u.getName().toLowerCase();
+                        if (username.equals(nam)) {
+                            muser.add(u);
+                        }}
                 }
-                    adapter = new SearchAdapter(muser, ctx);
-                    recyclerView.setAdapter(adapter);
+                adapter = new SearchAdapter(muser, ctx);
+                recyclerView.setAdapter(adapter);
             }
 
             @Override

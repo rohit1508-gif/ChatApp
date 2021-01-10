@@ -5,7 +5,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -13,7 +12,6 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
-import com.example.chatapp.Activity.SearchActivity;
 import com.example.chatapp.ModalClass.User;
 import com.example.chatapp.R;
 import com.google.firebase.auth.FirebaseAuth;
@@ -24,6 +22,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.List;
+import java.util.Objects;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -46,22 +45,14 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ImageViewH
         User u = muser.get(position);
         holder.myTextView.setText(u.getName());
         Glide.with(ctx).load(u.getImageUrl()).into(holder.myImageView);
-        FirebaseDatabase.getInstance().getReference("Users").child(fuser.getUid()).child("Friends")
+        FirebaseDatabase.getInstance().getReference("Users").child(fuser.getUid()).child("Friends").child(u.getUid())
                 .addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if(snapshot.exists()){
-                    for(DataSnapshot dataSnapshot:snapshot.getChildren()){
-                        String uid = dataSnapshot.getValue().toString();
-                        if(uid.equals(u.getUid())){
-                            holder.myButton.setEnabled(false);
-                            holder.myButton.setText("Friends");
-                        }
-                        else{
-                            holder.myButton.setEnabled(true);
-                            holder.myButton.setText("Request!");
-                        }
-                    }}
+                    holder.myButton.setEnabled(false);
+                    holder.myButton.setText("Friends");
+                    }
                 else{
                     holder.myButton.setEnabled(true);
                     holder.myButton.setText("Request!");

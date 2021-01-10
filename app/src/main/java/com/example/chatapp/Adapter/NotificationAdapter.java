@@ -48,12 +48,16 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
                 FirebaseDatabase.getInstance().getReference("Users").child(fuser.getUid()).child("Friends").child(u.getUid()).setValue(u.getUid());
                 FirebaseDatabase.getInstance().getReference("Users").child(u.getUid()).child("Friends").child(fuser.getUid()).setValue(fuser.getUid());
                 FirebaseDatabase.getInstance().getReference("Users").child(fuser.getUid()).child("Request").child(u.getUid()).removeValue();
+                muser.remove(position);
+                notifyItemRemoved(position);
             }
         });
         holder.button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 FirebaseDatabase.getInstance().getReference("Users").child(fuser.getUid()).child("Request").child(u.getUid()).removeValue();
+                muser.remove(position);
+                notifyItemRemoved(position);
             }
         });
     }

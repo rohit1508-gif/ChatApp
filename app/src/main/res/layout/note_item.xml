@@ -25,8 +25,9 @@
             android:layout_marginStart="20dp"
             android:layout_toEndOf="@id/userimage"
             android:textColor="@color/cardview_light_background"
-            android:textSize="24sp"
-            android:textStyle="bold" />
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:fontFamily="@font/roboto"/>
         <TextView
             android:layout_width="300dp"
             android:layout_height="wrap_content"
@@ -34,8 +35,8 @@
             android:layout_below="@id/username"
             android:layout_marginLeft="70dp"
             android:id="@+id/lastmessage"
-            android:textSize="20sp"
-            android:textColor="@color/common_google_signin_btn_text_dark_default"/>
+            android:textSize="18sp"
+            android:textColor="#B6B5B5" />
     </RelativeLayout>
 
 </androidx.cardview.widget.CardView>

@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".Activity.ChatActivity"
-    android:background="#36B1E8">
+    android:background="@drawable/pi">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appBarLayout"
@@ -59,7 +59,7 @@
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:layout_alignParentBottom="true"
-        android:layout_marginBottom="0dp"
+        android:layout_marginBottom="5dp"
         android:background="@drawable/background_chat_textview"
         android:padding="5dp"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -67,7 +67,7 @@
 
         <EditText
             android:id="@+id/sendTxt"
-            android:layout_width="330dp"
+            android:layout_width="275dp"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:background="@android:color/transparent"
@@ -82,7 +82,7 @@
             app:srcCompat="@android:drawable/ic_menu_send"
             android:layout_toRightOf="@id/sendTxt"/>
         <ImageButton
-            android:layout_width="25dp"
+            android:layout_width="20dp"
             android:layout_height="40dp"
             android:layout_alignParentEnd="true"
             android:layout_toRightOf="@+id/sendButton"

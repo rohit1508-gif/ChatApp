@@ -7,6 +7,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
@@ -108,7 +109,7 @@ public class ChatActivity extends AppCompatActivity {
         userName = findViewById(R.id.userName);
         status1 = findViewById(R.id.status1);
         sendImage = findViewById(R.id.sendButton);
-       image = findViewById(R.id.sendimage);
+        image = findViewById(R.id.sendimage);
         sendTxt = findViewById(R.id.sendTxt);
         mStorageRef = FirebaseStorage.getInstance().getReference("Chats");
         mActionBarToolbar = findViewById(R.id.toolbar_actionbar);
@@ -123,7 +124,7 @@ public class ChatActivity extends AppCompatActivity {
         mActionBarToolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i = new Intent(ChatActivity.this,UsernameActivity.class);
+                Intent i = new Intent(ChatActivity.this,HomeActivity.class);
                 startActivity(i);
             }
         });
@@ -190,7 +191,7 @@ public class ChatActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-       Intent i = new Intent(ChatActivity.this,UsernameActivity.class);
+       Intent i = new Intent(ChatActivity.this, HomeActivity.class);
        startActivity(i);
        finish();
     }
